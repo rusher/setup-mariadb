@@ -109,13 +109,14 @@ if [[ -n "${SETUP_INIT_SCRIPT_FOLDER}" ]]; then
     CONTAINER_ARGS+=("-v" "${SETUP_INIT_SCRIPT_FOLDER}:/docker-entrypoint-initdb.d")
 fi
 
-echo "::endgroup::"
-
 ###############################################################################
 
 if [[ -n "${SETUP_REGISTRY_USER}" && -n "${SETUP_REGISTRY_PASSWORD}" ]]; then
   echo "✅ registry information set"
-  CMD="${CONTAINER_RUNTIME} login ${REGISTRY_PREFIX} --username ${SETUP_ENTERPRISE_USER} --password ${SETUP_ENTERPRISE_TOKEN}"
+  CONTAINER_LOGIN_ARGS=()
+  CONTAINER_LOGIN_ARGS+=("--username" "${SETUP_REGISTRY_USER}")
+  CONTAINER_LOGIN_ARGS+=("--password" "${SETUP_REGISTRY_PASSWORD}")
+  CMD="${CONTAINER_RUNTIME} login ${REGISTRY_PREFIX} "${CONTAINER_LOGIN_ARGS[@]}""
   eval "${CMD}"
   echo "✅ connected to ${REGISTRY_PREFIX}"
 else
@@ -124,6 +125,8 @@ else
       exit 1;
   fi
 fi
+
+echo "::endgroup::"
 
 
 
