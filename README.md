@@ -1,4 +1,4 @@
-# setup-mariadb
+# MariaDB github action
 
 This action sets up a MariaDB server for the rest of the job. Here are some
 key features:
