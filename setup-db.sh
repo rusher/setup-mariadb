@@ -138,32 +138,23 @@ echo "::endgroup::"
 
 ###############################################################################
 echo "::group::🐳 Running Container"
+
+CONTAINER_ARGS+=("--health-interval" "1s")
+CONTAINER_ARGS+=("--health-timeout" "10s")
+CONTAINER_ARGS+=("--health-retries" "10")
+CONTAINER_ARGS+=("--health-start-period" "60s")
+
 CMD="${CONTAINER_RUNTIME} run -d ${CONTAINER_ARGS[@]} ${CONTAINER_IMAGE}"
 echo "${CMD}"
 # Run Docker container
 eval "${CMD}"
-echo "::endgroup::"
-###############################################################################
-
-###############################################################################
-echo "::group::⏰ Waiting for database to be ready"
-DB_IS_UP=""
-EXIT_VALUE=0
-
-for ((COUNTER=1; COUNTER <= 60; COUNTER++))
-do
-    echo "  - try #${COUNTER} of ${HEALTH_MAX_RETRIES}"
-    sleep 1
-    DB_IS_UP=$("${CONTAINER_RUNTIME}" exec mariadb healthcheck.sh && echo "yes" || echo "no")
-    if [[ "${DB_IS_UP}" == "yes" ]]; then
-        break
-    fi
-done
+exit_code=$?
 
 echo "::endgroup::"
-# Start a new group so that database readiness or failure is visible in actions.
 
-if [[ "${DB_IS_UP}" == "yes" ]]; then
+###############################################################################
+
+if [[ "${exit_code}" == "0" ]]; then
     echo "::group::✅ Database is ready!"
 else
     echo "::group::❌ Database failed to start on time."
