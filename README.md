@@ -4,7 +4,7 @@ This action sets up a MariaDB server for the rest of the job. Here are some
 key features:
 
 * Runs on Linux only for now action runners (other will be in next step).
-* can use either community, enterprise or development releases
+* Can use either community, enterprise or development releases
 
 #### Inputs
 
@@ -17,7 +17,7 @@ key features:
 | registry-password         | registry password when (mandatory when using enterprise registry)                                                                             |                     | No       |
 | container-runtime         | Container runtime to use (docker or podman)                                                                                                   | `podman`            | No       |
 | root-password             | Password for root user                                                                                                                        |                     | No       |
-| allow-empty-root-password | Permits empty root password                                                                                                                   | 1                   | No       |
+| allow-empty-root-password | Permits empty root password                                                                                                                   |                     | No       |
 | user                      | Create a MariaDB user                                                                                                                         |                     | No       |
 | password                  | Define a password for MariaDB user                                                                                                            |                     | No       |
 | database                  | Initial database to create                                                                                                                    |                     | No       |
