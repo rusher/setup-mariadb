@@ -1,0 +1,95 @@
+name: Setup-MariaDB
+
+description: 'Setup MariaDB action community or enterprise on Docker or Podman.'
+
+branding:
+  icon: 'database'
+  color: 'red'
+
+inputs:
+  tag:
+    description: 'Valid image tag depending on registry'
+    default: ''
+    required: false
+
+  port:
+    description: 'Exposed port for database connections.'
+    default: ''
+    required: false
+
+  registry:
+    description: 'registry for example "docker.io/mariadb", "quay.io/mariadb-foundation/mariadb-devel", or "docker.mariadb.com/enterprise-server"'
+    default: ''
+    required: false
+
+  registry-user:
+    description: 'registry docker username'
+    default: ''
+    required: false
+
+  registry-token:
+    description: 'registry docker token'
+    default: ''
+    required: false
+
+  container-runtime:
+    description: 'Container runtime to use (docker or podman).'
+    default: ''
+    required: false
+
+  root-password:
+    description: 'Password for root user'
+    required: false
+
+  allow-empty-root-password:
+    description: 'permits empty root password'
+    required: false
+
+  user:
+    description: 'Create a mariadb user'
+    required: false
+
+  password:
+    description: 'Define a password for mariadb user'
+    required: false
+
+  database:
+    description: 'Initial database'
+    required: false
+
+  conf-script-folder:
+    description: 'additional configuration directory'
+    required: false
+
+  init-script-folder:
+    description: 'initialized directory'
+    required: false
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Check runner
+      if: runner.os != 'Linux'
+      shell: bash
+      run: |
+        echo "::error:: Only Linux is supported for now"
+        exit 1
+
+    - name: Setup database
+      shell: bash
+      if: runner.os == 'Linux'
+      run: "${{ github.action_path }}/setup-db.sh"
+      env:
+        SETUP_TAG: ${{ inputs.tag }}
+        SETUP_PORT: ${{ inputs.port }}
+        SETUP_REGISTRY: ${{ inputs.registry }}
+        SETUP_REGISTRY_USER: ${{ inputs.registry-user }}
+        SETUP_REGISTRY_PASSWORD: ${{ inputs.registry-password }}
+        SETUP_CONTAINER_RUNTIME: ${{ inputs.container-runtime }}
+        SETUP_ROOT_PASSWORD: ${{ inputs.root-password }}
+        SETUP_ALLOW_EMPTY_ROOT_PASSWORD: ${{ inputs.allow-empty-root-password }}
+        SETUP_USER: ${{ inputs.user }}
+        SETUP_PASSWORD: ${{ inputs.password }}
+        SETUP_DATABASE: ${{ inputs.database }}
+        SETUP_CONF_SCRIPT_FOLDER: ${{ inputs.conf-script-folder }}
+        SETUP_INIT_SCRIPT_FOLDER: ${{ inputs.init-script-folder }}
