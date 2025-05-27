@@ -116,9 +116,15 @@ if [[ -n "${SETUP_REGISTRY_USER}" && -n "${SETUP_REGISTRY_PASSWORD}" ]]; then
   CONTAINER_LOGIN_ARGS=()
   CONTAINER_LOGIN_ARGS+=("--username" "${SETUP_REGISTRY_USER}")
   CONTAINER_LOGIN_ARGS+=("--password" "${SETUP_REGISTRY_PASSWORD}")
-  CMD="${CONTAINER_RUNTIME} login ${REGISTRY_PREFIX} "${CONTAINER_LOGIN_ARGS[@]}""
+  CMD="${CONTAINER_RUNTIME} login ${REGISTRY_PREFIX} ${CONTAINER_LOGIN_ARGS[@]} "
+  echo "${CMD}"
   eval "${CMD}"
-  echo "✅ connected to ${REGISTRY_PREFIX}"
+  exit_code=$?
+  if [[ "${exit_code}" == "0" ]]; then
+      echo "✅ connected to ${REGISTRY_PREFIX}"
+  else
+      echo "⚠️ fail to connected to ${REGISTRY_PREFIX}"
+  fi
 else
   if [[ "${SETUP_REGISTRY}" == "docker.mariadb.com/enterprise-server" ]]; then
       echo "❌ registry was not set"
@@ -132,7 +138,7 @@ echo "::endgroup::"
 
 ###############################################################################
 echo "::group::🐳 Running Container"
-CMD="${CONTAINER_RUNTIME} run -d "${CONTAINER_ARGS[@]}" ${CONTAINER_IMAGE}"
+CMD="${CONTAINER_RUNTIME} run -d ${CONTAINER_ARGS[@]} ${CONTAINER_IMAGE}"
 echo "${CMD}"
 # Run Docker container
 eval "${CMD}"
@@ -144,15 +150,20 @@ echo "::group::⏰ Waiting for database to be ready"
 DB_IS_UP=""
 EXIT_VALUE=0
 
+for ((COUNTER=1; COUNTER <= 60; COUNTER++))
+do
+    echo "  - try #${COUNTER} of ${HEALTH_MAX_RETRIES}"
+    sleep 1
+    DB_IS_UP=$("${CONTAINER_RUNTIME}" exec mariadb healthcheck.sh && echo "yes" || echo "no")
+    if [[ "${DB_IS_UP}" == "yes" ]]; then
+        break
+    fi
+done
 
-CMD="${CONTAINER_RUNTIME} healthcheck run mariadb"
-echo "${CMD}"
-# Run Docker container
-eval "${CMD}"
-exit_code=$?
 echo "::endgroup::"
+# Start a new group so that database readiness or failure is visible in actions.
 
-if [[ "${exit_code}" == "0" ]]; then
+if [[ "${DB_IS_UP}" == "yes" ]]; then
     echo "::group::✅ Database is ready!"
 else
     echo "::group::❌ Database failed to start on time."
@@ -160,5 +171,7 @@ else
     "${CONTAINER_RUNTIME}" logs mariadb
     EXIT_VALUE=1
 fi
+
+echo "::endgroup::"
 ###############################################################################
 exit ${EXIT_VALUE}
