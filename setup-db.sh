@@ -69,7 +69,7 @@ CONTAINER_ARGS+=("--name" "mariadb")
 # PASSWORD
 if [[ -n "${SETUP_ROOT_PASSWORD}" ]]; then
   CONTAINER_ARGS+=("-e" "MARIADB_ROOT_PASSWORD=${SETUP_ROOT_PASSWORD}")
-  echo "✅ MARIADB_ROOT_PASSWORD explicitly set"
+  echo "✅ root password is explicitly set"
 else
   if [[ -n "${SETUP_ALLOW_EMPTY_ROOT_PASSWORD}" && ( "${SETUP_ALLOW_EMPTY_ROOT_PASSWORD}" == "1" || "${SETUP_ALLOW_EMPTY_ROOT_PASSWORD}" == "yes" ) ]]; then
     CONTAINER_ARGS+=("-e" "MARIADB_ALLOW_EMPTY_ROOT_PASSWORD=1")
@@ -87,13 +87,13 @@ fi
 
 # USER
 if [[ -n "${SETUP_USER}" ]]; then
-    echo "✅ MARIADB_USER explicitly set"
+    echo "✅ mariadb user is explicitly set"
     CONTAINER_ARGS+=("-e" "MARIADB_USER=${SETUP_USER}")
 fi
 
 # PASSWORD
 if [[ -n "${SETUP_PASSWORD}" ]]; then
-    echo "✅ MARIADB_PASSWORD explicitly set"
+    echo "✅ mariadb password is explicitly set"
     CONTAINER_ARGS+=("-e" "MARIADB_PASSWORD=${SETUP_PASSWORD}")
 fi
 
@@ -112,7 +112,6 @@ fi
 ###############################################################################
 
 if [[ -n "${SETUP_REGISTRY_USER}" && -n "${SETUP_REGISTRY_PASSWORD}" ]]; then
-  echo "✅ registry information set"
   CONTAINER_LOGIN_ARGS=()
   CONTAINER_LOGIN_ARGS+=("--username" "${SETUP_REGISTRY_USER}")
   CONTAINER_LOGIN_ARGS+=("--password" "${SETUP_REGISTRY_PASSWORD}")
@@ -127,7 +126,7 @@ if [[ -n "${SETUP_REGISTRY_USER}" && -n "${SETUP_REGISTRY_PASSWORD}" ]]; then
   fi
 else
   if [[ "${SETUP_REGISTRY}" == "docker.mariadb.com/enterprise-server" ]]; then
-      echo "❌ registry was not set"
+      echo "❌ registry user and/or password was not set"
       exit 1;
   fi
 fi
