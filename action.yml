@@ -61,6 +61,10 @@ inputs:
     description: 'additional configuration directory'
     required: false
 
+  additional-conf:
+    description: 'additional configuration'
+    required: false
+
   init-script-folder:
     description: 'initialized directory'
     required: false
@@ -92,4 +96,5 @@ runs:
         SETUP_PASSWORD: ${{ inputs.password }}
         SETUP_DATABASE: ${{ inputs.database }}
         SETUP_CONF_SCRIPT_FOLDER: ${{ inputs.conf-script-folder }}
+        SETUP_ADDITIONAL_CONF: ${{ inputs.additional-conf }}
         SETUP_INIT_SCRIPT_FOLDER: ${{ inputs.init-script-folder }}

@@ -109,6 +109,19 @@ if [[ -n "${SETUP_INIT_SCRIPT_FOLDER}" ]]; then
     CONTAINER_ARGS+=("-v" "${SETUP_INIT_SCRIPT_FOLDER}:/docker-entrypoint-initdb.d")
 fi
 
+# ADDITIONAL_CONF
+if [[ -n "${SETUP_ADDITIONAL_CONF}" ]]; then
+    echo "✅ additional conf: ${SETUP_ADDITIONAL_CONF}"
+    # Parse the additional conf string into array elements
+    # This handles multiple parameters like "--port 3388 --max_allowed_packet 40M"
+    additional_conf_array=()
+  
+    eval "set -- ${SETUP_ADDITIONAL_CONF}"
+    additional_conf_array=("$@")
+    
+    CONTAINER_ARGS+=("${additional_conf_array[@]}")
+fi
+
 ###############################################################################
 
 if [[ -n "${SETUP_REGISTRY_USER}" && -n "${SETUP_REGISTRY_PASSWORD}" ]]; then

@@ -22,6 +22,7 @@ key features:
 | password                  | Define a password for MariaDB user                                                                                                            |                     | No       |
 | database                  | Initial database to create                                                                                                                    |                     | No       |
 | conf-script-folder        | Additional configuration directory                                                                                                            |                     | No       |
+| additional-conf           | Additional configuration                                                                                                                      |                     | No       |
 | init-script-folder        | Initialization script directory                                                                                                               |                     | No       |
 
 
@@ -37,6 +38,7 @@ steps:
       user: 'myUser'
       password: 'MyPassw0rd'
       database: 'myDb'
+      additional-conf: '--max_allowed_packet=40M --innodb_log_file_size=400M'
 ```
 
 #### enterprise
