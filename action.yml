@@ -112,7 +112,7 @@ runs:
         SETUP_ADDITIONAL_CONF: ${{ inputs.additional-conf }}
         SETUP_INIT_SCRIPT_FOLDER: ${{ inputs.init-script-folder }}
     - name: Setup local windows database
-      shell: bash
+      shell: cmd
       run: "${{ github.action_path }}/setup-windows.bat"
       if: runner.os == 'Windows' && inputs.registry == ''
       env:
