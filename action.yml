@@ -80,7 +80,7 @@ runs:
     - name: Setup database using docker/podman
       shell: bash
       run: "${{ github.action_path }}/setup-docker.sh"
-      if: inputs.local != '1' && inputs.local != 'true' && runner.os == 'Linux' && registry != "" 
+      if: inputs.local != '1' && inputs.local != 'true' && runner.os == 'Linux' && inputs.registry != ''
       env:
         SETUP_TAG: ${{ inputs.tag }}
         SETUP_PORT: ${{ inputs.port }}
@@ -112,6 +112,7 @@ runs:
         SETUP_ADDITIONAL_CONF: ${{ inputs.additional-conf }}
         SETUP_INIT_SCRIPT_FOLDER: ${{ inputs.init-script-folder }}
     - name: Setup local windows database
+      shell: bash
       run: "${{ github.action_path }}/setup-windows.bat"
       if: runner.os == 'Windows'
       env:
