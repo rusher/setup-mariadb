@@ -80,7 +80,7 @@ runs:
     - name: Setup database using docker/podman
       shell: bash
       run: "${{ github.action_path }}/setup-docker.sh"
-      if: inputs.local != '1' && inputs.local != 'true' && runner.os == 'Linux' && inputs.registry != ''
+      if: (inputs.local != '1' && inputs.local != 'true' && runner.os == 'Linux') || inputs.registry != ''
       env:
         SETUP_TAG: ${{ inputs.tag }}
         SETUP_PORT: ${{ inputs.port }}
@@ -99,7 +99,7 @@ runs:
     - name: Setup local macos / linux database
       shell: bash
       run: "${{ github.action_path }}/setup-local.sh"
-      if: inputs.local == '1' || inputs.local == 'true' || runner.os == 'MacOS' 
+      if: (inputs.local == '1' || inputs.local == 'true' || runner.os == 'MacOS') && inputs.registry == ''
       env:
         SETUP_TAG: ${{ inputs.tag }}
         SETUP_PORT: ${{ inputs.port }}
@@ -114,7 +114,7 @@ runs:
     - name: Setup local windows database
       shell: bash
       run: "${{ github.action_path }}/setup-windows.bat"
-      if: runner.os == 'Windows'
+      if: runner.os == 'Windows' && inputs.registry == ''
       env:
         SETUP_TAG: ${{ inputs.tag }}
         SETUP_PORT: ${{ inputs.port }}
