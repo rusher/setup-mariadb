@@ -208,6 +208,10 @@ check_mariadb_ready() {
     local port="${2:-3306}"
 
     echo $PATH
+
+    which mysql
+    mysql --version
+
     which mariadb
     mariadb --version
 
