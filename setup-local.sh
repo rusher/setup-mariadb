@@ -105,8 +105,10 @@ install_mariadb() {
             echo "Installing MariaDB using Homebrew..."
             if [[ -n "${MARIADB_VERSION}" ]]; then
                 brew install mariadb@"${MARIADB_VERSION}"
+                brew services start mariadb@"${MARIADB_VERSION}"
             else
                 brew install mariadb
+                brew services start mariadb
             fi
             ;;
         "apt")
@@ -230,7 +232,6 @@ check_mariadb_ready() {
 
 if check_mariadb_ready "" "3306"; then
     echo "✅ MariaDB is ready!"
-    break
 else
     echo "❌ MariaDB failed to start within 30 seconds"
     exit 1
@@ -325,7 +326,6 @@ configure_mariadb() {
             echo "⏳ Waiting for MariaDB to be ready after restart..."
             if check_mariadb_ready "${MARIADB_ROOT_PASSWORD}" "${MARIADB_PORT}"; then
                 echo "✅ MariaDB is ready!"
-                break
             else
                 echo "❌ MariaDB failed to start within 30 seconds"
                 exit 1
