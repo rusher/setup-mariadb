@@ -16,7 +16,7 @@ echo ??? Detected Windows OS
 
 REM Check for Chocolatey (required)
 if exist "%ProgramData%\chocolatey\bin\choco.exe" (
-    echo [✓] Using Chocolatey package manager
+    echo [???] Using Chocolatey package manager
 ) else (
     echo [!ERROR!] Chocolatey is required but not found
     echo Please install Chocolatey first: https://chocolatey.org/install
@@ -33,12 +33,12 @@ set MARIADB_VERSION=
 if not "%SETUP_TAG%"=="" (
     if not "%SETUP_TAG%"=="latest" (
         set MARIADB_VERSION=%SETUP_TAG%
-        echo [✓] MariaDB version set to !MARIADB_VERSION!
+        echo [???] MariaDB version set to !MARIADB_VERSION!
     ) else (
-        echo [✓] Using latest MariaDB version
+        echo [???] Using latest MariaDB version
     )
 ) else (
-    echo [✓] Using latest MariaDB version
+    echo [???] Using latest MariaDB version
 )
 
 REM Set port
@@ -46,13 +46,13 @@ set MARIADB_PORT=3306
 if not "%SETUP_PORT%"=="" (
     set MARIADB_PORT=%SETUP_PORT%
 )
-echo [✓] MariaDB port set to !MARIADB_PORT!
+echo [???] MariaDB port set to !MARIADB_PORT!
 
 REM Set root password
 set MARIADB_ROOT_PASSWORD=
 if not "%SETUP_ROOT_PASSWORD%"=="" (
     set MARIADB_ROOT_PASSWORD=%SETUP_ROOT_PASSWORD%
-    echo [✓] Root password is explicitly set
+    echo [???] Root password is explicitly set
 ) else (
     if "%SETUP_ALLOW_EMPTY_ROOT_PASSWORD%"=="1" (
         set MARIADB_ROOT_PASSWORD=
@@ -69,19 +69,19 @@ set MARIADB_USER=
 set MARIADB_PASSWORD=
 if not "%SETUP_USER%"=="" (
     set MARIADB_USER=%SETUP_USER%
-    echo [✓] MariaDB user set to !MARIADB_USER!
+    echo [???] MariaDB user set to !MARIADB_USER!
 )
 
 if not "%SETUP_PASSWORD%"=="" (
     set MARIADB_PASSWORD=%SETUP_PASSWORD%
-    echo [✓] MariaDB user password is explicitly set
+    echo [???] MariaDB user password is explicitly set
 )
 
 REM Set database
 set MARIADB_DATABASE=
 if not "%SETUP_DATABASE%"=="" (
     set MARIADB_DATABASE=%SETUP_DATABASE%
-    echo [✓] Initial database set to !MARIADB_DATABASE!
+    echo [???] Initial database set to !MARIADB_DATABASE!
 )
 
 REM Check for unsupported SETUP_ADDITIONAL_CONF
@@ -110,7 +110,7 @@ if %errorlevel%==0 (
         echo [!ERROR!] Failed to install MariaDB via Chocolatey
         exit /b 1
     )
-    echo [✓] MariaDB installation completed
+    echo [???] MariaDB installation completed
 )
 
 echo ::endgroup::
@@ -121,7 +121,7 @@ echo ::group:: Starting MariaDB Service
 echo Starting MariaDB service...
 net start MariaDB >nul 2>&1
 if %errorlevel%==0 (
-    echo [✓] MariaDB service started successfully
+    echo [???] MariaDB service started successfully
 ) else (
     echo [!] MariaDB service may already be running or failed to start
 )
@@ -132,7 +132,7 @@ set /a counter=0
 :wait_loop
 mysql -u root -e "SELECT 1;" >nul 2>&1
 if %errorlevel%==0 (
-    echo [✓] MariaDB is ready!
+    echo [???] MariaDB is ready!
     goto configure_db
 )
 set /a counter+=1
@@ -159,7 +159,7 @@ if not "%MARIADB_ROOT_PASSWORD%"=="" (
             mysqladmin -u root password "%MARIADB_ROOT_PASSWORD%" 2>nul
         )
     )
-    echo [✓] Root password configured
+    echo [???] Root password configured
 )
 
 REM Create database if specified
@@ -171,7 +171,7 @@ if not "%MARIADB_DATABASE%"=="" (
         mysql -u root -e "CREATE DATABASE IF NOT EXISTS `%MARIADB_DATABASE%`;"
     )
     if !errorlevel!==0 (
-        echo [✓] Database '%MARIADB_DATABASE%' created
+        echo [???] Database '%MARIADB_DATABASE%' created
     ) else (
         echo [!ERROR!] Failed to create database '%MARIADB_DATABASE%'
     )
@@ -198,7 +198,7 @@ if not "%MARIADB_USER%"=="" (
             )
             mysql -u root -e "FLUSH PRIVILEGES;"
         )
-        echo [✓] User '%MARIADB_USER%' created and granted privileges
+        echo [???] User '%MARIADB_USER%' created and granted privileges
     )
 )
 
@@ -250,12 +250,12 @@ if not "%SETUP_CONF_SCRIPT_FOLDER%"=="" (
             exit /b 1
         )
         
-        echo [✓] Using configuration file: !MY_INI_PATH!
+        echo [???] Using configuration file: !MY_INI_PATH!
         
         REM Create backup of original my.ini if it exists
         if exist "!MY_INI_PATH!" (
             copy "!MY_INI_PATH!" "!MY_INI_PATH!.backup.%date:~-4,4%%date:~-10,2%%date:~-7,2%_%time:~0,2%%time:~3,2%%time:~6,2%" >nul 2>&1
-            echo [✓] Created backup of existing my.ini
+            echo [???] Created backup of existing my.ini
         )
         
         REM Process each .cnf file
@@ -273,7 +273,7 @@ if not "%SETUP_CONF_SCRIPT_FOLDER%"=="" (
         
         REM Restart MariaDB service if configuration was updated
         if !CONFIG_UPDATED!==1 (
-            echo [✓] Configuration files processed, restarting MariaDB service...
+            echo [???] Configuration files processed, restarting MariaDB service...
             net stop MariaDB >nul 2>&1
             timeout /t 2 /nobreak >nul
             net start MariaDB >nul 2>&1
@@ -286,7 +286,7 @@ if not "%SETUP_CONF_SCRIPT_FOLDER%"=="" (
                 :restart_wait_loop
                 mysql -u root -e "SELECT 1;" >nul 2>&1
                 if !errorlevel!==0 (
-                    echo [✓] MariaDB is ready after restart!
+                    echo [???] MariaDB is ready after restart!
                     goto restart_complete
                 )
                 set /a restart_counter+=1
@@ -332,28 +332,28 @@ echo ::endgroup::
 REM ############################################################################
 echo ::group:: MariaDB Windows Installation Complete
 
-echo [✓] MariaDB has been successfully installed and configured on Windows!
+echo [???] MariaDB has been successfully installed and configured on Windows!
 echo.
-echo [✓] Configuration Summary:
-echo   [✓] Port: %MARIADB_PORT%
+echo [???] Configuration Summary:
+echo   [???] Port: %MARIADB_PORT%
 if not "%MARIADB_ROOT_PASSWORD%"=="" (
-    echo   [✓] Root Password set
+    echo   [???] Root Password set
 ) else (
-    echo   [✓] Root Password: ^(empty^)
+    echo   [???] Root Password: ^(empty^)
 )
 if not "%MARIADB_USER%"=="" (
-    echo   [✓] User: %MARIADB_USER%
+    echo   [???] User: %MARIADB_USER%
     if not "%MARIADB_PASSWORD%"=="" (
-        echo   [✓] User Password set
+        echo   [???] User Password set
     ) else (
-        echo   [✓] User Password: ^(not set^)
+        echo   [???] User Password: ^(not set^)
     )
 )
 if not "%MARIADB_DATABASE%"=="" (
-    echo   [✓] Database: %MARIADB_DATABASE%
+    echo   [???] Database: %MARIADB_DATABASE%
 )
 echo.
-echo [✓] Connection Examples:
+echo [???] Connection Examples:
 if not "%MARIADB_ROOT_PASSWORD%"=="" (
     echo   mysql -u root -p%MARIADB_ROOT_PASSWORD% -P %MARIADB_PORT%
 ) else (
