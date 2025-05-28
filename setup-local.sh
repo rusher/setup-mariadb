@@ -211,6 +211,19 @@ check_mariadb_ready() {
     which mariadb
     mariadb --version
 
+    ls -la $(brew --prefix)/bin | grep -i maria
+
+    # Check where Homebrew installed MariaDB
+    brew list mariadb | head -20
+
+    # Check Homebrew's bin directory
+    ls -la $(brew --prefix)/bin | grep maria
+
+    # Manually add to current session
+    export PATH="$(brew --prefix)/bin:$PATH"
+
+    mariadb --version
+
     if [[ -n "$password" ]]; then
       mysqlCmd=(mariadb -uroot --password="$password" --port= "$port")
     else
