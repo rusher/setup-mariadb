@@ -205,36 +205,36 @@ echo "⏳ Waiting for MariaDB to be ready..."
 check_mariadb_ready() {
     local password="$1"
     local port="${2:-3306}"
-    
-    # Try mariadb command first
-    if command -v mariadb &>/dev/null; then
-        if [[ -n "$password" ]]; then
-            mariadb -u root -p"$password" -P "$port" -e "SELECT 1;" &>/dev/null && return 0
-        else
-            mariadb -u root -P "$port" -e "SELECT 1;" &>/dev/null && return 0
-        fi
-    elif command -v mysql &>/dev/null; then
-        # Try mysql command as fallback    
-        if [[ -n "$password" ]]; then
-            mysql -u root -p"$password" -P "$port" -e "SELECT 1;" &>/dev/null && return 0
-        else
-            mysql -u root -P "$port" -e "SELECT 1;" &>/dev/null && return 0
-        fi
+
+    if [[ -n "$password" ]]; then
+      mysqlCmd=(mariadb -uroot --password="$password" --port= "$port")
+    else
+      mysqlCmd=(mariadb -uroot --port="$port")
     fi
-    return 1
+    for i in {15..0}; do
+      if echo 'SELECT 1' | "${mysqlCmd[@]}" &> /dev/null; then
+          break
+      fi
+      echo 'data server still not active'
+      sleep 5
+    done
+    if [ "$i" = 0 ]; then
+      if echo 'SELECT 1' | "${mysqlCmd[@]}" ; then
+          return 1;
+      fi
+      return 0;
+    else
+      return 1
+    fi
 }
 
-for i in {1..30}; do
-    if check_mariadb_ready "" "3306"; then
-        echo "✅ MariaDB is ready!"
-        break
-    elif [[ $i -eq 30 ]]; then
-        echo "❌ MariaDB failed to start within 30 seconds"
-        exit 1
-    else
-        sleep 1
-    fi
-done
+if check_mariadb_ready "" "3306"; then
+    echo "✅ MariaDB is ready!"
+    break
+else
+    echo "❌ MariaDB failed to start within 30 seconds"
+    exit 1
+fi
 
 echo "::endgroup::"
 
@@ -323,17 +323,13 @@ configure_mariadb() {
             
             # Wait for MariaDB to be ready after restart
             echo "⏳ Waiting for MariaDB to be ready after restart..."
-            for i in {1..30}; do
-                if check_mariadb_ready "${MARIADB_ROOT_PASSWORD}" "${MARIADB_PORT}"; then
-                    echo "✅ MariaDB is ready after restart!"
-                    break
-                elif [[ $i -eq 30 ]]; then
-                    echo "❌ MariaDB failed to start within 30 seconds after restart"
-                    exit 1
-                else
-                    sleep 1
-                fi
-            done
+            if check_mariadb_ready "${MARIADB_ROOT_PASSWORD}" "${MARIADB_PORT}"; then
+                echo "✅ MariaDB is ready!"
+                break
+            else
+                echo "❌ MariaDB failed to start within 30 seconds"
+                exit 1
+            fi
         else
             echo "⚠️ Could not find MariaDB configuration file to set custom port"
         fi
