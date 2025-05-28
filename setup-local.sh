@@ -105,11 +105,10 @@ install_mariadb() {
             echo "Installing MariaDB using Homebrew..."
             if [[ -n "${MARIADB_VERSION}" ]]; then
                 brew install mariadb@"${MARIADB_VERSION}"
-                brew services start mariadb@"${MARIADB_VERSION}"
             else
                 brew install mariadb
-                brew services start mariadb
             fi
+
             ;;
         "apt")
             echo "Installing MariaDB using APT..."
@@ -207,6 +206,10 @@ echo "⏳ Waiting for MariaDB to be ready..."
 check_mariadb_ready() {
     local password="$1"
     local port="${2:-3306}"
+
+    echo $PATH
+    which mariadb
+    mariadb --version
 
     if [[ -n "$password" ]]; then
       mysqlCmd=(mariadb -uroot --password="$password" --port= "$port")
